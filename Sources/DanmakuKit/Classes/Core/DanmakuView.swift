@@ -206,6 +206,11 @@ public class DanmakuView: PlatformView {
     public override init(frame: CGRect) {
         super.init(frame: frame)
         recalculateTracks()
+        #if os(macOS)
+        // iOS 侧有“presentation 命中”的链路，系统配合更友好；macOS 侧如果仅靠 cell 的 NSClickGestureRecognizer，很容易因为动画导致的“视图/图层几何不一致”而 miss。所以在这里处理
+        let containerClick = NSClickGestureRecognizer(target: self, action: #selector(containerDidClick(_:)))
+        self.addGestureRecognizer(containerClick)
+        #endif
     }
 
     required init?(coder: NSCoder) {
@@ -643,8 +648,7 @@ private extension DanmakuView {
             cell = cls.init(frame: frame)
             cell?.model = danmaku
             #if os(macOS)
-            let click = NSClickGestureRecognizer(target: self, action: #selector(danmakuDidClick(_:)))
-            cell?.addGestureRecognizer(click)
+            // Use container-level click recognizer only
             #else
             let tap = UITapGestureRecognizer(target: self, action: #selector(danmakuDidTap(_:)))
             cell?.addGestureRecognizer(tap)
@@ -669,9 +673,20 @@ private extension DanmakuView {
 
     #if os(macOS)
     @objc
-    func danmakuDidClick(_ gesture: NSClickGestureRecognizer) {
-        guard let view = gesture.view as? DanmakuCell else { return }
-        delegate?.danmakuView(self, didTapped: view)
+    private func containerDidClick(_ gesture: NSClickGestureRecognizer) {
+        let p = gesture.location(in: self)
+        for sub in subviews.reversed() {
+            guard let cell = sub as? DanmakuCell else { continue }
+            let rf = cell.realFrame
+            let rect = CGRect(x: rf.midX - cell.bounds.width / 2.0,
+                              y: rf.midY - cell.bounds.height / 2.0,
+                              width: cell.bounds.width,
+                              height: cell.bounds.height)
+            if rect.contains(p) {
+                delegate?.danmakuView(self, didTapped: cell)
+                break
+            }
+        }
     }
     #endif
 

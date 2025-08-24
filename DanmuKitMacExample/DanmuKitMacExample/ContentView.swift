@@ -224,7 +224,7 @@ struct ContentView: View {
         model.calculateSize()
 
         coordinator.shoot(danmaku: model)
-        print("弹幕出现: \(text) - 类型: \(randomType)")
+//        print("弹幕出现: \(text) - 类型: \(randomType)")
     }
 
     // MARK: - Button Actions
@@ -292,21 +292,7 @@ class DanmakuDelegate: DanmakuViewDelegate {
     }
 
     func danmakuView(_ danmakuView: DanmakuView, didEndDisplaying danmaku: DanmakuCell) {
-        // print("Did end displaying danmaku: \((danmaku.model as? DanmakuTextCellModel)?.text ?? "unknown")")
-    }
-
-    func danmakuView(_ danmakuView: DanmakuView, didClicked danmaku: DanmakuCell) {
-        let text = (danmaku.model as? DanmakuTextCellModel)?.text ?? "unknown"
-        print("Danmaku clicked: \(text)")
-
-        // Show alert when danmaku is clicked
-        DispatchQueue.main.async {
-            let alert = NSAlert()
-            alert.messageText = "弹幕被点击了！"
-            alert.informativeText = "你点击了弹幕：\(text)"
-            alert.addButton(withTitle: "确定")
-            alert.runModal()
-        }
+         print("Did end displaying danmaku: \((danmaku.model as? DanmakuTextCellModel)?.text ?? "unknown")")
     }
 
     func danmakuView(_ danmakuView: DanmakuView, didTapped danmaku: DanmakuCell) {
