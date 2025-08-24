@@ -172,22 +172,8 @@ public class DanmakuView: PlatformView {
             assert(newValue > 0, "Danmaku playing speed must be over 0.")
         }
         didSet {
-            #if os(macOS)
-            // Match DanmuKitMac: do not pause/resume on macOS when changing speed; only update tracks' speed.
-            for i in 0..<floatingTracks.count {
-                var track = floatingTracks[i]
-                track.playingSpeed = playingSpeed
-            }
-            for i in 0..<topTracks.count {
-                var track = topTracks[i]
-                track.playingSpeed = playingSpeed
-            }
-            for i in 0..<bottomTracks.count {
-                var track = bottomTracks[i]
-                track.playingSpeed = playingSpeed
-            }
-            #else
-            // iOS keeps existing behavior using update() to pause/resume for consistent restart.
+            // Apply iOS behavior on all platforms: pause -> update -> short delay -> play
+            // This ensures existing on-screen danmaku recompute durations with the new speed.
             update {
                 for i in 0..<floatingTracks.count {
                     var track = floatingTracks[i]
@@ -202,7 +188,6 @@ public class DanmakuView: PlatformView {
                     track.playingSpeed = playingSpeed
                 }
             }
-            #endif
         }
     }
 
