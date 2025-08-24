@@ -172,6 +172,22 @@ public class DanmakuView: PlatformView {
             assert(newValue > 0, "Danmaku playing speed must be over 0.")
         }
         didSet {
+            #if os(macOS)
+            // Match DanmuKitMac: do not pause/resume on macOS when changing speed; only update tracks' speed.
+            for i in 0..<floatingTracks.count {
+                var track = floatingTracks[i]
+                track.playingSpeed = playingSpeed
+            }
+            for i in 0..<topTracks.count {
+                var track = topTracks[i]
+                track.playingSpeed = playingSpeed
+            }
+            for i in 0..<bottomTracks.count {
+                var track = bottomTracks[i]
+                track.playingSpeed = playingSpeed
+            }
+            #else
+            // iOS keeps existing behavior using update() to pause/resume for consistent restart.
             update {
                 for i in 0..<floatingTracks.count {
                     var track = floatingTracks[i]
@@ -186,6 +202,7 @@ public class DanmakuView: PlatformView {
                     track.playingSpeed = playingSpeed
                 }
             }
+            #endif
         }
     }
 
@@ -488,6 +505,7 @@ private extension DanmakuView {
                 strongSelf.cellPlayingStop(cell)
             }
             track.index = UInt(i)
+            track.playingSpeed = playingSpeed
             track.positionY = CGFloat(i) * trackHeight + trackHeight / 2.0 + paddingTop + offsetY
         }
     }
@@ -513,6 +531,7 @@ private extension DanmakuView {
                 strongSelf.cellPlayingStop(cell)
             }
             track.index = UInt(i)
+            track.playingSpeed = playingSpeed
             track.positionY = CGFloat(i) * trackHeight + trackHeight / 2.0 + paddingTop + offsetY
         }
     }
@@ -539,6 +558,7 @@ private extension DanmakuView {
             }
             let index = bottomTracks.count - i - 1
             track.index = UInt(index)
+            track.playingSpeed = playingSpeed
             #if os(macOS)
             track.positionY = bounds.height - CGFloat(index) * trackHeight - trackHeight / 2.0 - paddingBottom - offsetY
             #else
@@ -684,11 +704,12 @@ private extension DanmakuView {
     }
 
     func cellPlayingStop(_ cell: DanmakuCell) {
+        // Match DanmuKitMac behavior: always remove from superview when a danmaku ends,
+        // then optionally append to pool for reuse to avoid lingering views.
         delegate?.danmakuView(self, didEndDisplaying: cell)
+        cell.removeFromSuperview()
         if enableCellReusable {
             self.appendCellToPool(cell)
-        } else {
-            cell.removeFromSuperview()
         }
     }
 

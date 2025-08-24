@@ -13,16 +13,16 @@ import Combine
 import AppKit
 #endif
 
-#if canImport(SwiftUI)
-// 平台适配：将 Representable 统一为 PlatformViewRepresentable
-#if canImport(UIKit)
-@available(iOS 13.0, tvOS 13.0, *)
-public typealias PlatformViewRepresentable = UIViewRepresentable
-#elseif os(macOS)
-@available(macOS 10.15, *)
-public typealias PlatformViewRepresentable = NSViewRepresentable
-#endif
-#endif
+//#if canImport(SwiftUI)
+//// 平台适配：将 Representable 统一为 PlatformViewRepresentable
+//#if canImport(UIKit)
+//@available(iOS 13.0, tvOS 13.0, *)
+//public typealias PlatformViewRepresentable = UIViewRepresentable
+//#elseif os(macOS)
+//@available(macOS 10.15, *)
+//public typealias PlatformViewRepresentable = NSViewRepresentable
+//#endif
+//#endif
 
 @available(iOS 14.0, tvOS 14.0, macOS 10.15, *)
 public struct DanmakuViewAdapter: PlatformViewRepresentable {
