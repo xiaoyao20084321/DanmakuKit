@@ -83,7 +83,7 @@ struct ContentView: View {
             // Danmaku View
             ZStack(alignment: .topLeading) {
                 DanmakuViewAdapter(coordinator: coordinator)
-                    .frame(width: 600, height: 300)
+                    .frame(minWidth: 400, maxWidth: .infinity, minHeight: 300, maxHeight: .infinity)
                     .background(Color.black)
                     .cornerRadius(8)
                     .overlay(
@@ -148,6 +148,7 @@ struct ContentView: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
         .onAppear {
             setupDanmakuView()
